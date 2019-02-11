@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
 import './App.css';
-import {LocationService, LocationStrategies} from "./lib/Location/location";
+import {LocationService, LocationStrategies} from "./lib/location/location";
+import {LocationProvider} from "./context/LocationContext";
+import {LocationSearch} from "./components/LocationSearch";
+import LocationMap from "./components/LocationMap";
 
+// google maps typings are weird
 type PlaceResult = google.maps.places.PlaceResult;
 
 enum FoodGenre {
@@ -19,37 +23,14 @@ interface State {
 }
 
 class App extends Component<Props, State> {
-    locationService = new LocationService().use(LocationStrategies.Google);
-
-    public state = {
-        // put all this in a GoogleMapsContext
-        places: [],
-    };
-
-    private handleGenreClick = (value: string) => async (e: React.MouseEvent) => {
-        const results = await this.locationService.getRestaurantsByLocation<PlaceResult>(value);
-
-        this.setState({places: results})
-    };
-
     render() {
         return (
-            <div className="App">
-                <ul>
-                    {Object.keys(FoodGenre).map(genre => <li onClick={this.handleGenreClick(genre)}
-                                                             key={genre}>{genre}</li>)}
-                </ul>
-                <h3>found places:</h3>
-                <ul>
-                    {
-                        this.state.places.map((place: google.maps.places.PlaceResult) => {
-                            return <li key={place.id}>
-                                {place.name}
-                            </li>
-                        })
-                    }
-                </ul>
-            </div>
+            <LocationProvider>
+                <div className="App">
+                    <LocationMap />
+                    <LocationSearch/>
+                </div>
+            </LocationProvider>
         );
     }
 }

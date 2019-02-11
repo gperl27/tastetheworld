@@ -19,5 +19,5 @@ export class LocationService implements LocationDelegate {
 }
 
 export interface LocationConfig {
-    getRestaurantsByLocation<T>(genre: string): T[] | Promise<T[]>;
+    getRestaurantsByLocation<T>(genre: string, location: google.maps.LatLng): T[] | Promise<T[]>;
 }
