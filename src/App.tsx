@@ -1,28 +1,57 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import {LocationService, LocationStrategies} from "./lib/Location/location";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+type PlaceResult = google.maps.places.PlaceResult;
+
+enum FoodGenre {
+    American = 'american',
+    Asian = 'asian',
+    Mexican = 'mexican'
+}
+
+interface Props {
+
+}
+
+interface State {
+    places: PlaceResult[];
+}
+
+class App extends Component<Props, State> {
+    locationService = new LocationService().use(LocationStrategies.Google);
+
+    public state = {
+        // put all this in a GoogleMapsContext
+        places: [],
+    };
+
+    private handleGenreClick = (value: string) => async (e: React.MouseEvent) => {
+        const results = await this.locationService.getRestaurantsByLocation<PlaceResult>(value);
+
+        this.setState({places: results})
+    };
+
+    render() {
+        return (
+            <div className="App">
+                <ul>
+                    {Object.keys(FoodGenre).map(genre => <li onClick={this.handleGenreClick(genre)}
+                                                             key={genre}>{genre}</li>)}
+                </ul>
+                <h3>found places:</h3>
+                <ul>
+                    {
+                        this.state.places.map((place: google.maps.places.PlaceResult) => {
+                            return <li key={place.id}>
+                                {place.name}
+                            </li>
+                        })
+                    }
+                </ul>
+            </div>
+        );
+    }
 }
 
 export default App;
