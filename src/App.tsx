@@ -1,34 +1,33 @@
 import React, {Component} from 'react';
+import 'bulma/css/bulma.css'
 import './App.css';
-import {LocationService, LocationStrategies} from "./lib/location/location";
 import {LocationProvider} from "./context/LocationContext";
 import {LocationSearch} from "./components/LocationSearch";
 import LocationMap from "./components/LocationMap";
 
-// google maps typings are weird
-type PlaceResult = google.maps.places.PlaceResult;
-
-enum FoodGenre {
-    American = 'american',
-    Asian = 'asian',
-    Mexican = 'mexican'
-}
-
-interface Props {
-
-}
-
-interface State {
-    places: PlaceResult[];
-}
-
-class App extends Component<Props, State> {
+class App extends Component {
     render() {
         return (
             <LocationProvider>
-                <div className="App">
-                    <LocationMap />
-                    <LocationSearch/>
+                <section className="hero is-primary">
+                    <div className="hero-body">
+                        <div className="container">
+                            <h1 className="title">
+                                Taste the World
+                            </h1>
+                            <h2 className="subtitle">
+                                One Bite at a Time
+                            </h2>
+                        </div>
+                    </div>
+                </section>
+                <div className="container">
+                    <section className={'section has-text-centered'}>
+                        <LocationMap />
+                    </section>
+                    <section className={'section has-text-centered'}>
+                        <LocationSearch/>
+                    </section>
                 </div>
             </LocationProvider>
         );

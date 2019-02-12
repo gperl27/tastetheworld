@@ -8,14 +8,14 @@ export class GoogleLocationStrategy implements LocationConfig {
         const request = {
             location,
             radius: 500,
-            query: genre,
-            type: 'restaurant'
+            keyword: genre,
+            type: ['restaurant']
         };
 
 
         return new Promise((resolve, reject) => {
             // @ts-ignore
-            return this.service.textSearch(request, (results: PlaceResult[], status: google.maps.places.PlacesServiceStatus) => {
+            return this.service.nearbySearch(request, (results: PlaceResult[], status: google.maps.places.PlacesServiceStatus) => {
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     return resolve(results)
                 }
