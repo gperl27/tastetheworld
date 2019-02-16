@@ -42,7 +42,7 @@ export class LocationProvider extends React.Component<Props, State> {
     changeLocation = () => {
         navigator.geolocation.getCurrentPosition( (position: Position) => {
             this.setState({location: position.coords })
-        });
+        }, () => {}, { enableHighAccuracy: true });
     }
 
     render() {

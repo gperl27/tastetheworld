@@ -18,6 +18,8 @@ export class LocationService implements LocationDelegate {
     }
 }
 
+type PlaceResult = google.maps.places.PlaceResult;
 export interface LocationConfig {
-    getRestaurantsByLocation<T>(genre: string, location: google.maps.LatLng): T[] | Promise<T[]>;
+    getRestaurantsByLocation(genre: string, location: google.maps.LatLng): PlaceResult[] | Promise<PlaceResult[]>;
+    getAutocompleteSuggestions<T>(input: string): T[] | Promise<T[]>;
 }
