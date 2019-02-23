@@ -1,13 +1,13 @@
 import * as React from "react";
 import {useContext, useState} from "react";
 import {LocationContext, LocationCtx} from "../context/LocationContext";
-import {Location} from "../lib/location/location";
+import {LocationSuggestion} from "../lib/location/location";
 import Autocomplete from "react-autocomplete";
 
 export function LocationSearch() {
     const locationContext: LocationCtx = useContext(LocationContext);
     const [input, setInput] = useState('');
-    const [suggestions, setSuggestions] = React.useState<Location[]>([]);
+    const [suggestions, setSuggestions] = React.useState<LocationSuggestion[]>([]);
 
     const onChangeInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -21,8 +21,9 @@ export function LocationSearch() {
         setSuggestions(await locationContext.getSuggestions(value));
     };
 
-    const onSelect = (value: string, item: Location) => {
+    const onSelect = (value: string, item: LocationSuggestion) => {
         setInput(value);
+        console.log('on select', item)
         locationContext.setUserLocation(item);
     }
 
@@ -31,9 +32,9 @@ export function LocationSearch() {
             <div>Location Search</div>
             <Autocomplete
                 renderInput={props => <input className={'input'} {...props} />}
-                getItemValue={(item: Location) => item.address}
+                getItemValue={(item: LocationSuggestion) => item.name}
                 items={suggestions}
-                renderItem={(item: Location, isHighlighted) => {
+                renderItem={(item: LocationSuggestion, isHighlighted) => {
                     const style = isHighlighted ? {
                         color: 'black',
                         cursor: 'pointer',
@@ -41,7 +42,7 @@ export function LocationSearch() {
 
                     return (
                         <div key={item.id} className={`list-item`} style={style}>
-                            {item.address}
+                            {item.name}
                         </div>
                     )
                 }}

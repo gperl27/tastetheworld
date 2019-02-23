@@ -1,4 +1,4 @@
-import {LocationProtocol, Location, LatLng} from "./location";
+import {Location, LocationProtocol, LocationSuggestion} from "./location";
 
 type PlaceResult = google.maps.places.PlaceResult;
 type AutocompletePrediction = google.maps.places.AutocompletePrediction;
@@ -9,11 +9,30 @@ export class GoogleLocationStrategy implements LocationProtocol {
     autocompleteService: google.maps.places.AutocompleteService;
 
     private static transformPlaceResultToLocation(placeResult: PlaceResult): Location {
-        return {id: placeResult.id, address: placeResult.vicinity};
+        return {
+            id: placeResult.place_id,
+            address: placeResult.vicinity,
+            name: placeResult.name,
+            latitude: placeResult.geometry.location.lat(),
+            longitude: placeResult.geometry.location.lng(),
+        };
     }
 
-    private static transformAutoCompletePredictionToLocation(prediction: AutocompletePrediction): Location {
-        return {id: prediction.place_id, address: prediction.description};
+    private static transformPredictionToLocationSuggestion(prediction: AutocompletePrediction): LocationSuggestion {
+        return {
+            id: prediction.place_id,
+            name: prediction.description,
+        };
+    }
+
+    public async getLocationByPlaceId(id: string): Promise<Location | undefined> {
+        const location = await this.getCoordinatesByPlaceId(id);
+
+        if (location) {
+            return GoogleLocationStrategy.transformPlaceResultToLocation(location);
+        }
+
+        return undefined;
     }
 
     public async getRestaurantsByLocation(id: string, genre: string): Promise<Location[]> {
@@ -46,11 +65,11 @@ export class GoogleLocationStrategy implements LocationProtocol {
     }
 
 
-    public getLocationSuggestions(input: string): Promise<Location[]> {
+    public getLocationSuggestions(input: string): Promise<LocationSuggestion[]> {
         return new Promise((resolve, reject) => {
             return this.autocompleteService.getPlacePredictions({input}, (results, status: google.maps.places.PlacesServiceStatus) => {
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
-                    const transformedLocations = results.map(GoogleLocationStrategy.transformAutoCompletePredictionToLocation);
+                    const transformedLocations = results.map(GoogleLocationStrategy.transformPredictionToLocationSuggestion);
 
                     return resolve(transformedLocations);
                 }
@@ -63,7 +82,7 @@ export class GoogleLocationStrategy implements LocationProtocol {
     private getCoordinatesByPlaceId(placeId: string): Promise<PlaceResult | null> {
         const request = {
             placeId,
-            fields: ['geometry']
+            fields: ['id', 'place_id', 'geometry', 'vicinity', 'name']
         };
 
         return new Promise((resolve, reject) => {

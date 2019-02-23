@@ -6,15 +6,23 @@ export enum LocationStrategies {
 
 export interface Location {
     id: string;
+    name: string;
     address: string;
+    latitude: number;
+    longitude: number;
 }
 
-export type LatLng = google.maps.LatLng | Coordinates;
+export interface LocationSuggestion {
+   id: string;
+   name: string;
+}
 
 export interface LocationProtocol {
     getRestaurantsByLocation(id: string, genre: string): Location[] | Promise<Location[]>;
 
-    getLocationSuggestions(input: string): Location[] | Promise<Location[]>;
+    getLocationSuggestions(input: string): LocationSuggestion[] | Promise<LocationSuggestion[]>;
+
+    getLocationByPlaceId(id: string): Promise<Location | undefined>;
 }
 
 interface LocationDelegate {

@@ -1,8 +1,6 @@
 import * as React from "react";
-import {Location, LocationService, LocationStrategies} from "../lib/location/location";
+import {Location, LocationService, LocationStrategies, LocationSuggestion} from "../lib/location/location";
 import {FoodGenre} from "../foodgenres";
-
-const LatLng = google.maps.LatLng;
 
 interface Props {
     children: React.ReactNode
@@ -15,11 +13,13 @@ export interface LocationCtx {
 
     getLocations(id: string, genre: FoodGenre): void;
 
-    getSuggestions(value: string): Promise<Location[]>;
+    getSuggestions(value: string): Promise<LocationSuggestion[]>;
 
     clearLocations(): void;
 
-    setUserLocation(location: Location): void;
+    setUserLocation(location: LocationSuggestion): void;
+
+    setSelectedLocation(location: Location): void;
 }
 
 // @ts-ignore
@@ -28,7 +28,7 @@ export const LocationContext: LocationCtx & React.ContextType = React.createCont
 export function LocationProvider(props: Props) {
     const locationService = new LocationService().use(LocationStrategies.Google);
     const [locations, setLocations] = React.useState<Location[]>([]);
-    const [userLocation, setUserLocation] = React.useState<Location | undefined>(undefined);
+    const [userLocation, setUserLocation] = React.useState<LocationSuggestion | undefined>(undefined);
     const [selectedLocation, setSelectedLocation] = React.useState<Location | undefined>(undefined);
 
     async function getLocations(id: string, genre: FoodGenre) {
@@ -41,12 +41,18 @@ export function LocationProvider(props: Props) {
     }
 
 
-    async function getSuggestions(value: string): Promise<Location[]> {
+    async function getSuggestions(value: string): Promise<LocationSuggestion[]> {
         return locationService.getLocationSuggestions(value);
     }
 
-    function updateUserLocation(loc: Location) {
-        setUserLocation(loc);
+    async function updateUserLocation(loc: LocationSuggestion) {
+        const userLocation = await locationService.getLocationByPlaceId(loc.id);
+
+        setUserLocation(userLocation);
+    }
+
+    function updateSelectedLocation(loc: Location) {
+        setSelectedLocation(loc);
     }
 
     return (
@@ -58,6 +64,7 @@ export function LocationProvider(props: Props) {
             clearLocations,
             getSuggestions,
             setUserLocation: updateUserLocation,
+            setSelectedLocation: updateSelectedLocation,
         }}>
             {props.children}
         </LocationContext.Provider>

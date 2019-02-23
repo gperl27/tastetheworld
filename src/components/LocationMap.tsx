@@ -4,14 +4,12 @@ import {LocationContext, LocationCtx} from "../context/LocationContext";
 import {FoodGenre, foodGenres} from "../foodgenres";
 import {Location} from "../lib/location/location";
 
-const LatLng = google.maps.LatLng;
 import qs from "qs";
 
 export default function LocationMap() {
     const locationContext: LocationCtx = useContext(LocationContext);
     const [chosenGenre, setChosenGenre] = useState<FoodGenre | null>(null)
     const [randomGenre, setRandomGenre] = useState<FoodGenre | null>(null);
-
 
     const handleGenreClick = (genre: FoodGenre) => async (e: React.MouseEvent) => {
         setChosenGenre(genre);
@@ -21,25 +19,27 @@ export default function LocationMap() {
         }
     }
 
+    const handleDirectionClick = (place: Location) => {
+        if (locationContext.userLocation) {
+            window.open(createDirectionUrl(place));
+            return;
+        }
+
+        return undefined;
+    };
+
     const createDirectionUrl = (place: Location): string => {
-        // let origin = '';
-        //
-        // if (location) {
-        //     if (typeof location === 'string') {
-        //        origin = location;
-        //     } else {
-        //         origin = `${location.latitude},${location.longitude}`
-        //     }
-        // }
-        //
-        // const params = {
-        //     destination: `${place.name} ${place.vicinity}`,
-        //     origin
-        // };
-        //
-        //
-        // return `https://www.google.com/maps/dir/?api=1&${qs.stringify(params)}`;
-        return ''
+        if (locationContext.userLocation) {
+            const params = {
+                destination: `${place.name} ${place.address}`,
+                origin: `${locationContext.userLocation.latitude}, ${locationContext.userLocation.longitude}`
+            };
+
+
+            return `https://www.google.com/maps/dir/?api=1&${qs.stringify(params)}`;
+        }
+
+        return '';
     };
 
     const renderGenres = () => {
@@ -94,7 +94,7 @@ export default function LocationMap() {
                             locationContext.locations.map((location) => {
                                 return (
                                     <div key={location.id} className={'columns is-mobile'}
-                                         onClick={() => window.open(createDirectionUrl(location))}
+                                         onClick={() => handleDirectionClick(location)}
                                     >
                                         <div className={'column is-half is-offset-one-quarter'}>
                                             <div className={'card'}>
@@ -108,7 +108,7 @@ export default function LocationMap() {
                                                             </figure>
                                                         </div>
                                                         <div className="media-content">
-                                                            <p className="title is-4">{location.id}</p>
+                                                            <p className="title is-4">{location.name}</p>
                                                             <p className="subtitle is-6">{location.address}</p>
                                                         </div>
                                                     </div>
