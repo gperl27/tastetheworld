@@ -12,7 +12,7 @@ export interface Location {
 export type LatLng = google.maps.LatLng | Coordinates;
 
 export interface LocationProtocol {
-    getRestaurantsByLocation(genre: string, location: LatLng): Location[] | Promise<Location[]>;
+    getRestaurantsByLocation(id: string, genre: string): Location[] | Promise<Location[]>;
 
     getLocationSuggestions(input: string): Location[] | Promise<Location[]>;
 }

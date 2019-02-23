@@ -1,38 +1,27 @@
 import * as React from "react";
 import {useContext, useEffect, useState} from "react";
 import {LocationContext, LocationCtx} from "../context/LocationContext";
-import qs from "qs";
 import {FoodGenre, foodGenres} from "../foodgenres";
+import {Location} from "../lib/location/location";
 
-type PlaceResult = google.maps.places.PlaceResult;
+const LatLng = google.maps.LatLng;
+import qs from "qs";
 
 export default function LocationMap() {
-    const [places, setPlaces] = useState<PlaceResult[]>([]);
-    // const {location, locationService}: LocationCtx = useContext(LocationContext);
+    const locationContext: LocationCtx = useContext(LocationContext);
     const [chosenGenre, setChosenGenre] = useState<FoodGenre | null>(null)
     const [randomGenre, setRandomGenre] = useState<FoodGenre | null>(null);
 
 
     const handleGenreClick = (genre: FoodGenre) => async (e: React.MouseEvent) => {
-        // console.log(genre, 'gerne')
-        // setChosenGenre(genre);
-        //
-        // if (location && typeof location !== 'string') {
-        //     const coords = new google.maps.LatLng(
-        //         location.latitude,
-        //         location.longitude
-        //     );
-        //
-        //     // use overloads to do zipcode instead of coords
-        //     const results = await locationService.getRestaurantsByLocation(genre.key, coords);
-        //
-        //     console.log(results, 'results')
-        //
-        //     setPlaces(results)
-        // }
+        setChosenGenre(genre);
+
+        if (locationContext.userLocation) {
+            await locationContext.getLocations(locationContext.userLocation.id, genre);
+        }
     }
 
-    const createDirectionUrl = (place: PlaceResult): string => {
+    const createDirectionUrl = (place: Location): string => {
         // let origin = '';
         //
         // if (location) {
@@ -70,19 +59,17 @@ export default function LocationMap() {
         const randomKey = Math.floor(keys.length * Math.random());
 
         setRandomGenre(foodGenres[keys[randomKey]])
-    }
+    };
 
     useEffect(() => {
         setChosenGenre(randomGenre)
 
-    }, [randomGenre])
+    }, [randomGenre]);
 
     const renderRandomGenreButton = () => {
         return <div className={'button'} onClick={chooseRandomGenre}>Choose For Me</div>
-    }
+    };
 
-    // todo
-    // quickfind incase users dont want to see food detail div
     return (
         <>
             <div>
@@ -104,12 +91,12 @@ export default function LocationMap() {
                     <h3>found places:</h3>
                     <>
                         {
-                            places.map((place: PlaceResult) => {
+                            locationContext.locations.map((location) => {
                                 return (
-                                    <div key={place.id} className={'columns is-mobile'}
-                                         onClick={() => window.open(createDirectionUrl(place))}
+                                    <div key={location.id} className={'columns is-mobile'}
+                                         onClick={() => window.open(createDirectionUrl(location))}
                                     >
-                                        <div key={place.id} className={'column is-half is-offset-one-quarter'}>
+                                        <div className={'column is-half is-offset-one-quarter'}>
                                             <div className={'card'}>
                                                 <div className="card-content">
                                                     <div className="media">
@@ -121,8 +108,8 @@ export default function LocationMap() {
                                                             </figure>
                                                         </div>
                                                         <div className="media-content">
-                                                            <p className="title is-4">{place.name}</p>
-                                                            <p className="subtitle is-6">{place.vicinity}</p>
+                                                            <p className="title is-4">{location.id}</p>
+                                                            <p className="subtitle is-6">{location.address}</p>
                                                         </div>
                                                     </div>
                                                 </div>

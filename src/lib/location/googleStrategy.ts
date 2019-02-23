@@ -16,23 +16,17 @@ export class GoogleLocationStrategy implements LocationProtocol {
         return {id: prediction.place_id, address: prediction.description};
     }
 
-    public async getRestaurantsByLocation(genre: string, location: google.maps.LatLng): Promise<Location[]> {
-        // let loc;
-        //
-        // if (typeof location === 'string') {
-        //     const place = await this.getCoordinatesByPlaceId(location);
-        //     if (!place) {
-        //         return [];
-        //     }
-        //
-        //     loc = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng())
-        // } else {
-        //     loc = location;
-        // }
+    public async getRestaurantsByLocation(id: string, genre: string): Promise<Location[]> {
+        const location = await this.getCoordinatesByPlaceId(id);
+
+        if (!location) {
+            return [];
+        }
+
+        const latLng = new google.maps.LatLng(location.geometry.location.lat(), location.geometry.location.lng());
 
         const request = {
-            // location: loc,
-            location,
+            location: latLng,
             radius: 2000,
             keyword: genre,
             type: 'restaurant'
@@ -66,22 +60,22 @@ export class GoogleLocationStrategy implements LocationProtocol {
         })
     }
 
-    // public getCoordinatesByPlaceId(placeId: string): Promise<PlaceResult | null> {
-    //     const request = {
-    //         placeId,
-    //         fields: ['geometry']
-    //     };
-    //
-    //     return new Promise((resolve, reject) => {
-    //         return this.service.getDetails(request, (result, status: google.maps.places.PlacesServiceStatus) => {
-    //             if (status == google.maps.places.PlacesServiceStatus.OK) {
-    //                 return resolve(result)
-    //             }
-    //
-    //             return resolve(null)
-    //         });
-    //     })
-    // }
+    private getCoordinatesByPlaceId(placeId: string): Promise<PlaceResult | null> {
+        const request = {
+            placeId,
+            fields: ['geometry']
+        };
+
+        return new Promise((resolve, reject) => {
+            return this.service.getDetails(request, (result, status: google.maps.places.PlacesServiceStatus) => {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    return resolve(result)
+                }
+
+                return resolve(null)
+            });
+        })
+    }
 
     constructor() {
         this.map = new google.maps.Map(document.createElement('div'), {});

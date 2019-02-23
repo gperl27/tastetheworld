@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Location, LocationService, LocationStrategies} from "../lib/location/location";
+import {FoodGenre} from "../foodgenres";
 
 const LatLng = google.maps.LatLng;
 
@@ -12,7 +13,7 @@ export interface LocationCtx {
     selectedLocation?: Location;
     userLocation?: Location;
 
-    getLocations(id: string): void;
+    getLocations(id: string, genre: FoodGenre): void;
 
     getSuggestions(value: string): Promise<Location[]>;
 
@@ -30,9 +31,8 @@ export function LocationProvider(props: Props) {
     const [userLocation, setUserLocation] = React.useState<Location | undefined>(undefined);
     const [selectedLocation, setSelectedLocation] = React.useState<Location | undefined>(undefined);
 
-    async function getLocations(id: string) {
-        const tmpLatLng = new LatLng(30, -80);
-        const results = await locationService.getRestaurantsByLocation('mexican', tmpLatLng);
+    async function getLocations(id: string, genre: FoodGenre) {
+        const results = await locationService.getRestaurantsByLocation(id, genre.key);
         setLocations(results);
     }
 
