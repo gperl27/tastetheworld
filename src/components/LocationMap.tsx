@@ -8,16 +8,20 @@ import qs from "qs";
 
 export default function LocationMap() {
     const locationContext: LocationCtx = useContext(LocationContext);
-    const [chosenGenre, setChosenGenre] = useState<FoodGenre | null>(null)
+    const [chosenGenre, setChosenGenre] = useState<FoodGenre | null>(null);
     const [randomGenre, setRandomGenre] = useState<FoodGenre | null>(null);
 
     const handleGenreClick = (genre: FoodGenre) => async (e: React.MouseEvent) => {
+        await chooseGenre(genre);
+    };
+
+    const chooseGenre = async (genre: FoodGenre) => {
         setChosenGenre(genre);
 
         if (locationContext.userLocation) {
             await locationContext.getLocations(locationContext.userLocation.id, genre);
         }
-    }
+    };
 
     const handleDirectionClick = (place: Location) => {
         if (locationContext.userLocation) {
@@ -62,7 +66,11 @@ export default function LocationMap() {
     };
 
     useEffect(() => {
-        setChosenGenre(randomGenre)
+        if (randomGenre) {
+            (async function () {
+                await chooseGenre(randomGenre)
+            }())
+        }
 
     }, [randomGenre]);
 
