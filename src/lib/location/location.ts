@@ -23,6 +23,8 @@ export interface LocationProtocol {
     getLocationSuggestions(input: string): LocationSuggestion[] | Promise<LocationSuggestion[]>;
 
     getLocationByPlaceId(id: string): Promise<Location | undefined>;
+
+    createDirectionUrl(place: Location, origin: Location): string;
 }
 
 interface LocationDelegate {

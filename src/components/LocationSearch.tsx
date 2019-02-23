@@ -23,9 +23,8 @@ export function LocationSearch() {
 
     const onSelect = (value: string, item: LocationSuggestion) => {
         setInput(value);
-        console.log('on select', item)
         locationContext.setUserLocation(item);
-    }
+    };
 
     return (
         <>

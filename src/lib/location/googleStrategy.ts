@@ -1,4 +1,5 @@
 import {Location, LocationProtocol, LocationSuggestion} from "./location";
+import qs from "qs";
 
 type PlaceResult = google.maps.places.PlaceResult;
 type AutocompletePrediction = google.maps.places.AutocompletePrediction;
@@ -77,6 +78,15 @@ export class GoogleLocationStrategy implements LocationProtocol {
                 return resolve([])
             });
         })
+    }
+
+    public createDirectionUrl(place: Location, origin: Location): string {
+        const params = {
+            destination: `${place.name} ${place.address}`,
+            origin: `${origin.latitude}, ${origin.longitude}`
+        };
+
+        return `https://www.google.com/maps/dir/?api=1&${qs.stringify(params)}`;
     }
 
     private getCoordinatesByPlaceId(placeId: string): Promise<PlaceResult | null> {

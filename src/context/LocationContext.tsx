@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Location, LocationService, LocationStrategies, LocationSuggestion} from "../lib/location/location";
 import {FoodGenre} from "../foodgenres";
+import qs from "qs";
 
 interface Props {
     children: React.ReactNode
@@ -20,6 +21,8 @@ export interface LocationCtx {
     setUserLocation(location: LocationSuggestion): void;
 
     setSelectedLocation(location: Location): void;
+    
+    createLocationUrl(location: Location): string;
 }
 
 // @ts-ignore
@@ -28,7 +31,7 @@ export const LocationContext: LocationCtx & React.ContextType = React.createCont
 export function LocationProvider(props: Props) {
     const locationService = new LocationService().use(LocationStrategies.Google);
     const [locations, setLocations] = React.useState<Location[]>([]);
-    const [userLocation, setUserLocation] = React.useState<LocationSuggestion | undefined>(undefined);
+    const [userLocation, setUserLocation] = React.useState<Location | undefined>(undefined);
     const [selectedLocation, setSelectedLocation] = React.useState<Location | undefined>(undefined);
 
     async function getLocations(id: string, genre: FoodGenre) {
@@ -54,6 +57,14 @@ export function LocationProvider(props: Props) {
     function updateSelectedLocation(loc: Location) {
         setSelectedLocation(loc);
     }
+    
+    function createLocationUrl(location: Location) {
+        if (userLocation) {
+            return locationService.createDirectionUrl(location, userLocation);
+        }
+
+        return '';
+    }
 
     return (
         <LocationContext.Provider value={{
@@ -65,6 +76,7 @@ export function LocationProvider(props: Props) {
             getSuggestions,
             setUserLocation: updateUserLocation,
             setSelectedLocation: updateSelectedLocation,
+            createLocationUrl
         }}>
             {props.children}
         </LocationContext.Provider>
