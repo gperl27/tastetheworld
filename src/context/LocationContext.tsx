@@ -17,6 +17,8 @@ export interface LocationCtx {
     getSuggestions(value: string): Promise<Location[]>;
 
     clearLocations(): void;
+
+    setUserLocation(location: Location): void;
 }
 
 // @ts-ignore
@@ -43,6 +45,10 @@ export function LocationProvider(props: Props) {
         return locationService.getLocationSuggestions(value);
     }
 
+    function updateUserLocation(loc: Location) {
+        setUserLocation(loc);
+    }
+
     return (
         <LocationContext.Provider value={{
             locations,
@@ -50,7 +56,8 @@ export function LocationProvider(props: Props) {
             selectedLocation,
             getLocations,
             clearLocations,
-            getSuggestions
+            getSuggestions,
+            setUserLocation: updateUserLocation,
         }}>
             {props.children}
         </LocationContext.Provider>

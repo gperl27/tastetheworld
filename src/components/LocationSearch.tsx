@@ -1,7 +1,8 @@
 import * as React from "react";
 import {useContext, useState} from "react";
 import {LocationContext, LocationCtx} from "../context/LocationContext";
-import { Location } from "../lib/location/location";
+import {Location} from "../lib/location/location";
+import Autocomplete from "react-autocomplete";
 
 export function LocationSearch() {
     const locationContext: LocationCtx = useContext(LocationContext);
@@ -20,37 +21,34 @@ export function LocationSearch() {
         setSuggestions(await locationContext.getSuggestions(value));
     };
 
-    // const renderLocation = () => {
-    //     if (locationContext.location) {
-    //         if (typeof locationContext.location === 'string') {
-    //             return locationContext.location;
-    //         }
-    //
-    //         return `Lat: ${locationContext.location.latitude} - Lon: ${locationContext.location.longitude}`
-    //     }
-    //
-    // }
-
-    // {suggestions.map(suggestion => {
-    //     return <div className={'list-item'}
-    //                 onClick={async () => await locationContext.updateLocation(suggestion.place_id)}
-    //                 key={suggestion.place_id}>{suggestion.description}</div>
-    // })}
-    function renderResults() {
-        return suggestions.map(suggestion => {
-            return <div className={'list-item'} key={suggestion.id}>{suggestion.address}</div>
-        })
+    const onSelect = (value: string, item: Location) => {
+        setInput(value);
+        locationContext.setUserLocation(item);
     }
 
     return (
         <>
-            <div>location search</div>
-            <input value={input} onChange={onChangeInput}/>
-            {suggestions.length > 0 &&
-            <div className={'list is-hoverable'}>
-                {renderResults()}
-            </div>
-            }
+            <div>Location Search</div>
+            <Autocomplete
+                renderInput={props => <input className={'input'} {...props} />}
+                getItemValue={(item: Location) => item.address}
+                items={suggestions}
+                renderItem={(item: Location, isHighlighted) => {
+                    const style = isHighlighted ? {
+                        color: 'black',
+                        cursor: 'pointer',
+                    } : {};
+
+                    return (
+                        <div key={item.id} className={`list-item`} style={style}>
+                            {item.address}
+                        </div>
+                    )
+                }}
+                value={input}
+                onChange={onChangeInput}
+                onSelect={onSelect}
+            />
         </>
     )
 }
