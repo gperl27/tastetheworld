@@ -1,59 +1,58 @@
 import * as React from "react";
-import {ContextType} from "react";
-import {LocationService, LocationStrategies} from "../lib/location/location";
-import {GoogleLocationStrategy} from "../lib/location/googleStrategy";
+import {Location, LocationService, LocationStrategies} from "../lib/location/location";
 
+const LatLng = google.maps.LatLng;
 
 interface Props {
-
-}
-
-interface State {
-    location?: Coordinates
+    children: React.ReactNode
 }
 
 export interface LocationCtx {
-    location?: Coordinates;
-    locationService: GoogleLocationStrategy;
+    locations: Location[];
+    selectedLocation?: Location;
+    userLocation?: Location;
 
-    changeLocation(): void;
+    getLocations(id: string): void;
+
+    getSuggestions(value: string): Promise<Location[]>;
+
+    clearLocations(): void;
 }
 
 // @ts-ignore
-export const LocationContext: LocationCtx & ContextType = React.createContext();
+export const LocationContext: LocationCtx & React.ContextType = React.createContext();
 
-export class LocationProvider extends React.Component<Props, State> {
-    locationService = new LocationService().use(LocationStrategies.Google);
+export function LocationProvider(props: Props) {
+    const locationService = new LocationService().use(LocationStrategies.Google);
+    const [locations, setLocations] = React.useState<Location[]>([]);
+    const [userLocation, setUserLocation] = React.useState<Location | undefined>(undefined);
+    const [selectedLocation, setSelectedLocation] = React.useState<Location | undefined>(undefined);
 
-    public state = {
-        location: undefined
-    };
-
-    componentDidMount(): void {
-        if ("geolocation" in navigator) {
-            /* geolocation is available */
-            console.log('we have geo')
-        } else {
-            /* geolocation IS NOT available */
-            console.log('no geo')
-        }
+    async function getLocations(id: string) {
+        const tmpLatLng = new LatLng(30, -80);
+        const results = await locationService.getRestaurantsByLocation('mexican', tmpLatLng);
+        setLocations(results);
     }
 
-    changeLocation = () => {
-        navigator.geolocation.getCurrentPosition( (position: Position) => {
-            this.setState({location: position.coords })
-        }, () => {}, { enableHighAccuracy: true });
+    function clearLocations() {
+        setLocations([]);
     }
 
-    render() {
-        return (
-            <LocationContext.Provider value={{
-                location: this.state.location,
-                changeLocation: this.changeLocation,
-                locationService: this.locationService
-            }}>
-                {this.props.children}
-            </LocationContext.Provider>
-        )
+
+    async function getSuggestions(value: string): Promise<Location[]> {
+        return locationService.getLocationSuggestions(value);
     }
+
+    return (
+        <LocationContext.Provider value={{
+            locations,
+            userLocation,
+            selectedLocation,
+            getLocations,
+            clearLocations,
+            getSuggestions
+        }}>
+            {props.children}
+        </LocationContext.Provider>
+    )
 }

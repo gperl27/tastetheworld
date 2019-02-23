@@ -4,6 +4,19 @@ export enum LocationStrategies {
     Google
 }
 
+export interface Location {
+    id: string;
+    address: string;
+}
+
+export type LatLng = google.maps.LatLng | Coordinates;
+
+export interface LocationProtocol {
+    getRestaurantsByLocation(genre: string, location: LatLng): Location[] | Promise<Location[]>;
+
+    getLocationSuggestions(input: string): Location[] | Promise<Location[]>;
+}
+
 interface LocationDelegate {
     use(strategy: LocationStrategies): GoogleLocationStrategy
 }
@@ -18,8 +31,3 @@ export class LocationService implements LocationDelegate {
     }
 }
 
-type PlaceResult = google.maps.places.PlaceResult;
-export interface LocationConfig {
-    getRestaurantsByLocation(genre: string, location: google.maps.LatLng): PlaceResult[] | Promise<PlaceResult[]>;
-    getAutocompleteSuggestions<T>(input: string): T[] | Promise<T[]>;
-}

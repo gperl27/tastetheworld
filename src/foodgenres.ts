@@ -1,5 +1,12 @@
+
+enum Genre {
+   American = 'american',
+   Mexican = 'mexican',
+   Asian = 'asian',
+}
+
 export interface FoodGenre {
-    key: string;
+    key: Genre;
     name: string;
     description: string;
     popularDishes: string[];
@@ -16,21 +23,21 @@ interface Genres {
 
 export const foodGenres: Genres = {
     american: {
-        key: 'american',
+        key: Genre.American,
         name: 'American',
         description: 'America stuff here',
         popularDishes: ['Hamburger', 'Pizza'],
         spiceLevel: 2
     },
     mexican: {
-        key: 'mexican',
+        key: Genre.Mexican,
         name: 'Mexican',
         description: 'Mexican stuff here',
         popularDishes: ['Tacos', 'Burritos'],
         spiceLevel: 3
     },
     asian: {
-        key: 'asian',
+        key: Genre.Asian,
         name: 'Asian',
         description: 'Asian stuff here',
         popularDishes: ['Teriyaki Chicken', 'Sushi'],
