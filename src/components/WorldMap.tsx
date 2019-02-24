@@ -11,8 +11,9 @@ import {Motion, spring} from "react-motion"
 import MAP from '../assets/maps/world-110m.json';
 import {LocationContext, LocationCtx} from "../context/LocationContext";
 import {useContext} from "react";
-import {useState} from "react";
 import {FoodGenre, foodGenres} from "../foodgenres";
+import {geoPath} from "d3-geo"
+import {geoTimes} from "d3-geo-projection";
 
 const wrapperStyles = {
     width: "100%",
@@ -21,24 +22,14 @@ const wrapperStyles = {
 }
 
 type Coordinates = [number, number];
-type City = { name: string, coordinates: Coordinates }
-
-const cities: City[] = [
-    {name: "Zurich", coordinates: [8.5417, 47.3769]},
-    {name: "Singapore", coordinates: [103.8198, 1.3521]},
-    {name: "San Francisco", coordinates: [-122.4194, 37.7749]},
-    {name: "Sydney", coordinates: [151.2093, -33.8688]},
-    {name: "Lagos", coordinates: [3.3792, 6.5244]},
-    {name: "Buenos Aires", coordinates: [-58.3816, -34.6037]},
-    {name: "Shanghai", coordinates: [121.4737, 31.2304]},
-];
 
 export function WorldMap() {
     const locationContext: LocationCtx = useContext(LocationContext);
-    const [center, setCenter] = React.useState<Coordinates>([0, 20])
+    const [center, setCenter] = React.useState<Coordinates>([0, 20]);
     const [zoom, setZoom] = React.useState(1);
+    const [selectedCountry, setSelectedCountry] = React.useState<Geography | undefined>(undefined)
 
-    console.log(locationContext, 'ctx')
+    console.log(selectedCountry, 'selectedcountry')
 
     function handleZoomIn() {
         setZoom(zoom * 2);
@@ -53,12 +44,28 @@ export function WorldMap() {
         setZoom(1);
     }
 
-    async function handleCountryClick(geography: { properties: { genreKey: string; }; }) {
-        const genre = foodGenres[geography.properties.genreKey];
+    function projection() {
+        return geoTimes()
+            .translate([980 / 2, 550 / 2])
+            .scale(160)
+    }
 
-        if (genre) {
-            await getLocations(genre);
-        }
+    async function handleCountryClick(geography: Geography) {
+        // const genre = foodGenres[geography.properties.genreKey];
+
+        setSelectedCountry(geography);
+
+
+        const path = geoPath().projection(projection());
+        // @ts-ignore
+        const centroid = projection().invert(path.centroid(geography))
+
+        setCenter(centroid);
+        setZoom(2)
+
+        // if (genre) {
+        //     await getLocations(genre);
+        // }
     }
 
 
@@ -105,36 +112,39 @@ export function WorldMap() {
                             <Geographies geography={MAP} disableOptimization>
                                 {(geographies, projection) =>
                                     // @ts-ignore
-                                    geographies.map((geography, i) => geography.id !== "010" && (
-                                        <Geography
-                                            key={i}
-                                            cacheId={`geography-${i}`}
-                                            geography={geography}
-                                            projection={projection}
-                                            // @ts-ignore
-                                            onClick={handleCountryClick}
-                                            style={{
-                                                default: {
-                                                    fill: "#ECEFF1",
-                                                    stroke: "#607D8B",
-                                                    strokeWidth: 0.75,
-                                                    outline: "none",
-                                                },
-                                                hover: {
-                                                    fill: "#CFD8DC",
-                                                    stroke: "#607D8B",
-                                                    strokeWidth: 0.75,
-                                                    outline: "none",
-                                                },
-                                                pressed: {
-                                                    fill: "#FF5722",
-                                                    stroke: "#607D8B",
-                                                    strokeWidth: 0.75,
-                                                    outline: "none",
-                                                },
-                                            }}
-                                        />
-                                    ))}
+                                    geographies.map((geography, i) => {
+                                        return (
+                                            <Geography
+                                                key={i}
+                                                cacheId={`geography-${i}`}
+                                                geography={geography}
+                                                projection={projection}
+                                                // @ts-ignore
+                                                onClick={handleCountryClick}
+                                                style={{
+                                                    default: {
+                                                        // @ts-ignore
+                                                        fill: `${selectedCountry && selectedCountry.properties.ISO_A3 === geography.properties.ISO_A3 ? '#FF5722' : '#ECEFF1'}`,
+                                                        stroke: "#607D8B",
+                                                        strokeWidth: 0.75,
+                                                        outline: "none",
+                                                    },
+                                                    hover: {
+                                                        fill: "#CFD8DC",
+                                                        stroke: "#607D8B",
+                                                        strokeWidth: 0.75,
+                                                        outline: "none",
+                                                    },
+                                                    pressed: {
+                                                        fill: "#FF5722",
+                                                        stroke: "#607D8B",
+                                                        strokeWidth: 0.75,
+                                                        outline: "none",
+                                                    },
+                                                }}
+                                            />
+                                        )
+                                    })}
                             </Geographies>
                         </ZoomableGroup>
                     </ComposableMap>
