@@ -4,6 +4,7 @@ import './App.css';
 import {LocationProvider} from "./context/LocationContext";
 import {LocationSearch} from "./components/LocationSearch";
 import LocationMap from "./components/LocationMap";
+import {WorldMap} from "./components/WorldMap";
 
 class App extends Component {
     render() {
@@ -21,11 +22,13 @@ class App extends Component {
                         </div>
                     </div>
                 </section>
-                     <section className={'section has-text-centered'}>
-                        <LocationSearch/>
-                    </section>               <div className="container">
+                <WorldMap/>
+                <section className={'section has-text-centered'}>
+                    <LocationSearch/>
+                </section>
+                <div className="container">
                     <section className={'section has-text-centered'}>
-                        <LocationMap />
+                        <LocationMap/>
                     </section>
                 </div>
             </LocationProvider>

@@ -36,6 +36,7 @@ export function LocationProvider(props: Props) {
 
     async function getLocations(id: string, genre: FoodGenre) {
         const results = await locationService.getRestaurantsByLocation(id, genre.key);
+        console.log(id, genre, results, 'RESULTS')
         setLocations(results);
     }
 
@@ -49,7 +50,9 @@ export function LocationProvider(props: Props) {
     }
 
     async function updateUserLocation(loc: LocationSuggestion) {
+        console.log('set loc?')
         const userLocation = await locationService.getLocationByPlaceId(loc.id);
+        console.log('about to set loc')
 
         setUserLocation(userLocation);
     }
