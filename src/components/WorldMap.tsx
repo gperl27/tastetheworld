@@ -14,12 +14,14 @@ import {useContext} from "react";
 import {FoodGenre, foodGenres} from "../foodgenres";
 import {geoPath} from "d3-geo"
 import {geoTimes} from "d3-geo-projection";
+import {FoodGenreDetail} from "./FoodGenreDetail";
 
 const wrapperStyles = {
     width: "100%",
     maxWidth: 980,
     margin: "0 auto",
-}
+    position: 'relative',
+};
 
 type Coordinates = [number, number];
 
@@ -28,8 +30,6 @@ export function WorldMap() {
     const [center, setCenter] = React.useState<Coordinates>([0, 20]);
     const [zoom, setZoom] = React.useState(1);
     const [selectedCountry, setSelectedCountry] = React.useState<Geography | undefined>(undefined)
-
-    console.log(selectedCountry, 'selectedcountry')
 
     function handleZoomIn() {
         setZoom(zoom * 2);
@@ -42,6 +42,7 @@ export function WorldMap() {
     function handleReset() {
         setCenter([0, 20]);
         setZoom(1);
+        setSelectedCountry(undefined);
     }
 
     function projection() {
@@ -76,6 +77,7 @@ export function WorldMap() {
     };
 
     return (
+        // @ts-ignore
         <div style={wrapperStyles}>
             <button onClick={handleZoomIn}>
                 {"Zoom in"}
@@ -86,6 +88,16 @@ export function WorldMap() {
             <button onClick={handleReset}>
                 {"Reset"}
             </button>
+            {selectedCountry && <div
+                style={{
+                    position: 'absolute',
+                    left: 0,
+                    bottom: 0,
+                    backgroundColor: 'white',
+                    border: '1px solid black',
+                }}>
+                <FoodGenreDetail genre={foodGenres.asian} handleClickEat={() => console.log('eat me')}/>
+            </div>}
             <Motion
                 defaultStyle={{
                     zoom: 1,
