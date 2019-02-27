@@ -22,13 +22,13 @@ class App extends Component {
                         </div>
                     </div>
                 </section>
+                {/*<section className={'section has-text-centered'}>*/}
+                {/*<LocationSearch/>*/}
+                {/*</section>*/}
                 <WorldMap/>
-                <section className={'section has-text-centered'}>
-                    <LocationSearch/>
-                </section>
                 <div className="container">
                     <section className={'section has-text-centered'}>
-                        <LocationMap/>
+
                     </section>
                 </div>
             </LocationProvider>

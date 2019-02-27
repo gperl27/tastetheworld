@@ -15,15 +15,18 @@ import {FoodGenre, foodGenres} from "../foodgenres";
 import {geoPath} from "d3-geo"
 import {geoTimes} from "d3-geo-projection";
 import {FoodGenreDetail} from "./FoodGenreDetail";
+import {Card} from "./Card";
 
 const wrapperStyles = {
     width: "100%",
-    maxWidth: 980,
     margin: "0 auto",
     position: 'relative',
 };
 
 type Coordinates = [number, number];
+
+const MAP_WIDTH = 850;
+const MAP_HEIGHT = 400;
 
 export function WorldMap() {
     const locationContext: LocationCtx = useContext(LocationContext);
@@ -47,7 +50,7 @@ export function WorldMap() {
 
     function projection() {
         return geoTimes()
-            .translate([980 / 2, 550 / 2])
+            .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2])
             .scale(160)
     }
 
@@ -79,24 +82,29 @@ export function WorldMap() {
     return (
         // @ts-ignore
         <div style={wrapperStyles}>
-            <button onClick={handleZoomIn}>
-                {"Zoom in"}
-            </button>
-            <button onClick={handleZoomOut}>
-                {"Zoom out"}
-            </button>
-            <button onClick={handleReset}>
+            <button
+                className={'button'}
+                style={{
+                    position: 'absolute',
+                    top: MAP_HEIGHT / 4,
+                    right: MAP_WIDTH / 4,
+                }}
+                onClick={handleReset}>
                 {"Reset"}
             </button>
             {selectedCountry && <div
                 style={{
                     position: 'absolute',
-                    left: 0,
-                    bottom: 0,
+                    left: MAP_WIDTH / 4,
+                    bottom: MAP_HEIGHT / 4,
                     backgroundColor: 'white',
-                    border: '1px solid black',
                 }}>
-                <FoodGenreDetail genre={foodGenres.asian} handleClickEat={() => console.log('eat me')}/>
+                <Card
+                    closable={true}
+                    onClose={handleReset}
+                >
+                    <FoodGenreDetail genre={foodGenres.asian} handleClickEat={() => console.log('eat me')}/>
+                </Card>
             </div>}
             <Motion
                 defaultStyle={{
@@ -112,9 +120,9 @@ export function WorldMap() {
             >
                 {({zoom, x, y}) => (
                     <ComposableMap
-                        projectionConfig={{scale: 205}}
-                        width={980}
-                        height={551}
+                        projectionConfig={{scale: 125}}
+                        width={MAP_WIDTH}
+                        height={MAP_HEIGHT}
                         style={{
                             width: "100%",
                             height: "auto",
