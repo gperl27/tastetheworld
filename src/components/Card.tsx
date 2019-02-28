@@ -9,16 +9,12 @@ interface Props {
 
 export const Card = (props: Props) => {
     return (
-        <div className={'card'}>
-            <div className={'card-header'}>
-                {
-                    props.closable &&
-                    <button onClick={props.onClose ? props.onClose : undefined} className={'delete'}/>
-                }
-            </div>
-            <div className="card-content">
-                {props.children}
-            </div>
+        <div style={{maxWidth: '400px'}} className={'card notification'}>
+            {
+                props.closable &&
+                <button onClick={props.onClose ? props.onClose : undefined} className={'delete'}/>
+            }
+            {props.children}
         </div>
     )
 }

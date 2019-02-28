@@ -1,8 +1,7 @@
-
 enum Genre {
-   American = 'american',
-   Mexican = 'mexican',
-   Asian = 'asian',
+    American = 'american',
+    Mexican = 'mexican',
+    Asian = 'asian',
 }
 
 export interface FoodGenre {
@@ -39,7 +38,9 @@ export const foodGenres: Genres = {
     asian: {
         key: Genre.Asian,
         name: 'Asian',
-        description: 'Asian stuff here',
+        description: `
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Cras fermentum odio eu feugiat. Lectus magna fringilla urna porttitor rhoncus. Et magnis dis parturient montes nascetur.
+        `,
         popularDishes: ['Teriyaki Chicken', 'Sushi'],
         spiceLevel: 5
     }
