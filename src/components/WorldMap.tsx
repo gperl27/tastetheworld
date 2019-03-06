@@ -16,6 +16,7 @@ import {geoPath} from "d3-geo"
 import {geoTimes} from "d3-geo-projection";
 import {FoodGenreDetail} from "./FoodGenreDetail";
 import {Card} from "./Card";
+import ReactTooltip from 'react-tooltip'
 
 const wrapperStyles = {
     width: "100%",
@@ -56,6 +57,7 @@ export function WorldMap() {
 
     async function handleCountryClick(geography: Geography) {
         // const genre = foodGenres[geography.properties.genreKey];
+        console.log(geography, 'geo')
 
         setSelectedCountry(geography);
 
@@ -140,6 +142,8 @@ export function WorldMap() {
                                                 geography={geography}
                                                 projection={projection}
                                                 // @ts-ignore
+                                                data-tip={geography.properties.NAME}
+                                                // @ts-ignore
                                                 onClick={handleCountryClick}
                                                 style={{
                                                     default: {
@@ -170,6 +174,7 @@ export function WorldMap() {
                     </ComposableMap>
                 )}
             </Motion>
+            <ReactTooltip/>
         </div>
     )
 }
