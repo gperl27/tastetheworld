@@ -39481,7 +39481,8 @@
             "ISO_A3": "USA",
             "CONTINENT": "North America",
             "REGION_UN": "Americas",
-            "SUBREGION": "Northern America"
+            "SUBREGION": "Northern America",
+            "genre": "american"
           }
         },
         {

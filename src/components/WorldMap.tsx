@@ -17,6 +17,8 @@ import {geoTimes} from "d3-geo-projection";
 import {FoodGenreDetail} from "./FoodGenreDetail";
 import {Card} from "./Card";
 import ReactTooltip from 'react-tooltip'
+import {LocationSearch} from "./LocationSearch";
+import {SearchResults} from "./SearchResults";
 
 const wrapperStyles = {
     width: "100%",
@@ -55,29 +57,29 @@ export function WorldMap() {
             .scale(160)
     }
 
-    async function handleCountryClick(geography: Geography) {
-        // const genre = foodGenres[geography.properties.genreKey];
-        console.log(geography, 'geo')
+    interface ExtendedGeographyProperties {
+        genreKey: string;
+    }
 
+    async function handleCountryClick(geography: Geography & { properties: ExtendedGeographyProperties }) {
         setSelectedCountry(geography);
-
 
         const path = geoPath().projection(projection());
         // @ts-ignore
-        const centroid = projection().invert(path.centroid(geography))
+        const centroid = projection().invert(path.centroid(geography));
 
         setCenter(centroid);
-        setZoom(2)
-
-        // if (genre) {
-        //     await getLocations(genre);
-        // }
+        setZoom(2);
     }
 
 
-    const getLocations = async (genre: FoodGenre) => {
+    const onClickEat = async () => {
         if (locationContext.userLocation) {
+            // @ts-ignore
+            const genre = foodGenres[selectedCountry.properties.genre];
             await locationContext.getLocations(locationContext.userLocation.id, genre);
+        } else {
+            alert('please find your location!')
         }
     };
 
@@ -94,20 +96,32 @@ export function WorldMap() {
                 onClick={handleReset}>
                 {"Reset"}
             </button>
-            {selectedCountry && <div
+            {selectedCountry &&
+            <div
                 style={{
                     position: 'absolute',
                     left: MAP_WIDTH / 4,
-                    bottom: MAP_HEIGHT / 4,
+                    top: MAP_HEIGHT / 4,
                     backgroundColor: 'white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
                 }}>
                 <Card
                     closable={true}
                     onClose={handleReset}
                 >
-                    <FoodGenreDetail genre={foodGenres.asian} handleClickEat={() => console.log('eat me')}/>
+                    <FoodGenreDetail genre={foodGenres.asian} handleClickEat={onClickEat}/>
                 </Card>
-            </div>}
+                <Card
+                    closable={true}
+                    onClose={handleReset}
+                >
+                    <LocationSearch/>
+                    <SearchResults/>
+                </Card>
+            </div>
+            }
             <Motion
                 defaultStyle={{
                     zoom: 1,
